@@ -2,6 +2,7 @@ import express from 'express';
 import Joi from 'joi';
 import { hashedPassword } from '../utils/hashedPassword';
 import User from '../models/user';
+import passport from 'passport';
 
 const router = express.Router();
 
@@ -18,13 +19,24 @@ router.post('/signup', async (req, res) => {
 			password: hashed,
 			provider: 'local',
 		});
+		await newUser.save();
 		return res.status(201).json(newUser);
 	} catch (error) {
 		return res.status(500).json({ error: error });
 	}
 });
 
-// router.post("/signin", )
+// router.post('/signin', (req, res, next) => {
+// 	passport.authenticate('local', (err, user, info) => {
+// 		console.log(err);
+// 		console.log(user);
+// 		console.log(info);
+// 	})(req, res, next);
+// 	res.status(200);
+// });
+router.post('/signin', passport.authenticate('local'), (req, res) => {
+	console.log('user', req.user);
+});
 
 interface IUser {
 	name: string;

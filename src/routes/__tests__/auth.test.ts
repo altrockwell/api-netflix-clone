@@ -86,11 +86,18 @@ describe('auth', () => {
 
 		describe('given all inputs are valid', () => {
 			test('should return 201', async () => {
-				const res = await exec();
+				try {
+					const res = await exec();
 
-				expect(res.statusCode).toEqual(201);
-				expect(res.body).toHaveProperty('name', requestData.name);
-				expect(res.body).toHaveProperty('email', requestData.email);
+					const newUser = await User.findUserByEmail(
+						requestData.email as string
+					);
+
+					expect(res.statusCode).toEqual(201);
+					expect(res.body).toHaveProperty('name', requestData.name);
+					expect(res.body).toHaveProperty('email', requestData.email);
+					expect(newUser).toHaveProperty('email', requestData.email);
+				} catch (error) {}
 			});
 		});
 	});

@@ -9,7 +9,7 @@ const app = express();
 // configure env file base on app environment
 require('dotenv').config({
 	path: path
-		.join(__dirname, '..', `${app.get('env').env}`)
+		.join(__dirname, '..', `${app.get('env')}.env`)
 		.split(' ')
 		.join(''),
 });

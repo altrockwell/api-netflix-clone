@@ -13,11 +13,9 @@ describe('getUserByEmail', () => {
 			});
 			await newUser.save();
 			const result = await User.findUserByEmail('johndoe@gmail.com');
-
+			console.log(newUser);
 			expect(result).toHaveProperty('name', 'John Doe');
 			expect(result).toHaveProperty('email', 'johndoe@gmail.com');
-		} catch (error) {
-			console.log(error);
-		}
+		} catch (error) {}
 	});
 });
