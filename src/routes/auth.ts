@@ -35,7 +35,7 @@ router.post('/signup', async (req, res) => {
 // 	res.status(200);
 // });
 router.post('/signin', passport.authenticate('local'), (req, res) => {
-	console.log('user', req.user);
+	return res.status(200).json(req.user);
 });
 
 interface IUser {
