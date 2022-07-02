@@ -23,9 +23,9 @@ describe('auth', () => {
 			email: 'johnDoe@gmail.com',
 		};
 	});
-	afterEach(() => {
-		User.remove({});
-	});
+	// afterEach(() => {
+	// 	User.remove({});
+	// });
 	describe('POST /signup', () => {
 		describe('given inputs are not complete', () => {
 			it('should return 400 when email is not provided', async () => {
@@ -55,7 +55,7 @@ describe('auth', () => {
 			it('should return 400 when email is not valid', async () => {
 				requestData.email = 'johndoe';
 				const res = await request(app).post('/signup').send(requestData);
-				console.log(res.body);
+
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty(
 					'error',
@@ -64,8 +64,8 @@ describe('auth', () => {
 			});
 			it('should return 400 when email is too short', async () => {
 				requestData.email = 'a@a.com';
-				const res = await request(app).post('/signup').send(requestData);
-				console.log(res.body);
+				const res = await exec();
+
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty(
 					'error',
@@ -75,7 +75,7 @@ describe('auth', () => {
 			it('should return 400 when email is too long', async () => {
 				const longString = new Array(257).join('a') + '@gmail.com';
 				requestData.email = longString;
-				const res = await request(app).post('/signup').send(requestData);
+				const res = await exec();
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty(
 					'error',
@@ -86,21 +86,12 @@ describe('auth', () => {
 
 		describe('given all inputs are valid', () => {
 			test('should return 201', async () => {
-				const hashed = hashedPassword(requestData.password as string);
-				await new User({
-					name: requestData.name,
-					email: requestData.email,
-					password: hashed,
-				});
 				const res = await exec();
+
 				expect(res.statusCode).toEqual(201);
+				expect(res.body).toHaveProperty('name', requestData.name);
+				expect(res.body).toHaveProperty('email', requestData.email);
 			});
 		});
-
-		// Check if password is hashed
-		// Return 400 if email is already exist in db
-		// Return 201 if request is validate
-		// Save user in the DB
-		// Return user
 	});
 });

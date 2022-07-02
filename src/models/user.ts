@@ -18,8 +18,8 @@ const userSchema = new Schema<IUser, UserModel>({
 	provider: { type: String, default: 'local', enum: ['local', 'google'] },
 });
 
-userSchema.static('findUserByEmail', function (email: string) {
-	return this.findOne({ email: email });
+userSchema.static('findUserByEmail', async function (email: string) {
+	return await this.findOne({ email: email });
 });
 
 export default model<IUser, UserModel>('User', userSchema);
