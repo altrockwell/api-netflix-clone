@@ -4,4 +4,7 @@ module.exports = {
 	testEnvironment: 'node',
 	clearMocks: true,
 	coverageProvider: 'v8',
+	testTimeout: 500000,
+	forceExit: true,
+	detectOpenHandles: true,
 };

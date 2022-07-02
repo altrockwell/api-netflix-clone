@@ -1,10 +1,12 @@
 import app from './app';
 import mongoose from 'mongoose';
 
-app.listen(8080, async () => {
-	console.log(`Server listening on port 8080`);
+import config from './config';
+
+app.listen(config.app.port, async () => {
+	console.log(`Server listening on port ${config.app.port}`);
 	mongoose
-		.connect('mongodb://localhost:27017/test')
-		.then(() => console.log('Connected to db'))
+		.connect(config.mongodb.uri, config.mongodb.configOptions)
+		.then(() => console.log(`Connected to ${config.mongodb.uri}`))
 		.catch((error) => console.log(error));
 });
