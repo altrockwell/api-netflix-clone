@@ -1,8 +1,9 @@
 import express from 'express';
 import Joi from 'joi';
 import { hashedPassword } from '../utils/hashedPassword';
-import User from '../models/user';
+import User, { IUser, validateNewUser } from '../models/user';
 import passport from 'passport';
+import isAuthenticated from '../middlewares/isAuthenticated';
 
 const router = express.Router();
 
@@ -26,37 +27,33 @@ router.post('/signup', async (req, res) => {
 	}
 });
 
-// router.post('/signin', (req, res, next) => {
-// 	passport.authenticate('local', (err, user, info) => {
-// 		console.log(err);
-// 		console.log(user);
-// 		console.log(info);
-// 	})(req, res, next);
-// 	res.status(200);
-// });
 router.post('/signin', passport.authenticate('local'), (req, res) => {
-	return res.status(200).json(req.user);
+	return res.status(201).json(req.user);
 });
 
-interface IUser {
-	name: string;
-	email: string;
-	password: string;
-}
-
-const validateNewUser = (user: IUser) => {
-	const schema = Joi.object({
-		name: Joi.string().min(3).max(255).required(),
-		email: Joi.string()
-			.email({ ignoreLength: true })
-			.min(10)
-			.max(255)
-			.required()
-			.lowercase(),
-		password: Joi.string().min(6).max(255).alphanum().required(),
+router.get(
+	'/login/federated/google',
+	passport.authenticate('google', { scope: ['email', 'profile'] })
+);
+router.get(
+	'/auth/google/callback',
+	passport.authenticate('google', {
+		successRedirect: '/google-success',
+		failureRedirect: '/google-failed',
+	})
+);
+router.get('/google-success', isAuthenticated, (req, res) => {
+	res.status(200).json({ user: req.user });
+});
+router.get('/google-failed', (req, res) => {
+	res.status(400).send('auth failed');
+});
+router.post('/logout', isAuthenticated, (req, res, next) => {
+	req.logOut(function (err) {
+		if (err) {
+			return res.status(400);
+		}
+		return res.status(201);
 	});
-
-	return schema.validate(user);
-};
-
+});
 export default router;

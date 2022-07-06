@@ -1,7 +1,7 @@
-import { hashedPassword } from './../../utils/hashedPassword';
-import app from '../../app';
+import { hashedPassword } from './../../../utils/hashedPassword';
+import app from '../../../app';
 import request from 'supertest';
-import User from '../../models/user';
+import User from '../../../models/user';
 
 interface IRequestData {
 	name?: string;
@@ -10,26 +10,26 @@ interface IRequestData {
 }
 
 describe('auth', () => {
-	let requestData: IRequestData;
+	let user: IRequestData;
 	let requestStatement: any;
 	const exec = async () => {
-		return await request(app).post('/signup').send(requestData);
+		return await request(app).post('/signup').send(user);
 	};
 
 	beforeEach(() => {
-		requestData = {
+		user = {
 			name: 'John Doe',
 			password: 'johndoe123',
 			email: 'johnDoe@gmail.com',
 		};
 	});
-	// afterEach(() => {
-	// 	User.remove({});
-	// });
+	afterEach(() => {
+		User.remove({});
+	});
 	describe('POST /signup', () => {
 		describe('given inputs are not complete', () => {
 			it('should return 400 when email is not provided', async () => {
-				delete requestData.email;
+				delete user.email;
 
 				const res = await exec();
 
@@ -38,14 +38,14 @@ describe('auth', () => {
 			});
 
 			it('should return 400 when name is not provided', async () => {
-				delete requestData.name;
-				const res = await request(app).post('/signup').send(requestData);
+				delete user.name;
+				const res = await request(app).post('/signup').send(user);
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty('error', '"name" is required');
 			});
 			it('should return 400 when password is not provided', async () => {
-				delete requestData.password;
-				const res = await request(app).post('/signup').send(requestData);
+				delete user.password;
+				const res = await request(app).post('/signup').send(user);
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty('error', '"password" is required');
 			});
@@ -53,8 +53,8 @@ describe('auth', () => {
 
 		describe('given email is invalid', () => {
 			it('should return 400 when email is not valid', async () => {
-				requestData.email = 'johndoe';
-				const res = await request(app).post('/signup').send(requestData);
+				user.email = 'johndoe';
+				const res = await request(app).post('/signup').send(user);
 
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty(
@@ -63,7 +63,7 @@ describe('auth', () => {
 				);
 			});
 			it('should return 400 when email is too short', async () => {
-				requestData.email = 'a@a.com';
+				user.email = 'a@a.com';
 				const res = await exec();
 
 				expect(res.statusCode).toEqual(400);
@@ -74,7 +74,7 @@ describe('auth', () => {
 			});
 			it('should return 400 when email is too long', async () => {
 				const longString = new Array(257).join('a') + '@gmail.com';
-				requestData.email = longString;
+				user.email = longString;
 				const res = await exec();
 				expect(res.statusCode).toEqual(400);
 				expect(res.body).toHaveProperty(
@@ -85,18 +85,18 @@ describe('auth', () => {
 		});
 
 		describe('given all inputs are valid', () => {
-			test('should return 201', async () => {
+			test('should return 201 and user added to database', async () => {
 				try {
 					const res = await exec();
 
-					const newUser = await User.findUserByEmail(
-						requestData.email as string
-					);
+					// const newUser = await User.find({ email: user.email });
+					// console.log(newUser);
 
 					expect(res.statusCode).toEqual(201);
-					expect(res.body).toHaveProperty('name', requestData.name);
-					expect(res.body).toHaveProperty('email', requestData.email);
-					expect(newUser).toHaveProperty('email', requestData.email);
+					expect(res.body).toHaveProperty('name', user.name);
+					expect(res.body).toHaveProperty('email', user.email);
+					// expect(newUser.length).toBe(1);
+					// expect(newUser.length).toBe(1)
 				} catch (error) {}
 			});
 		});

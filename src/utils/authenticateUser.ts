@@ -39,8 +39,9 @@ export const authenticateGoogleUser = async (
 			name: profile.displayName,
 			provider: 'google',
 		});
-		user.save();
+		await user.save();
 	}
+	console.log(user);
 
 	return done(null, user);
 };

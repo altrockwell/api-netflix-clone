@@ -14,7 +14,7 @@
 		"passport-local": "^1.0.0"
 	},
 	"scripts": {
-		"test": "set NODE_ENV=testing && jest --watchAll --verbose --runInBand",
+		"test": "set NODE_ENV=testing && jest --watchAll --verbose --runInBand --coverage ",
 		"testOne": "jest",
 		"dev": "set NODE_ENV=development && nodemon src/index.ts"
 	},
